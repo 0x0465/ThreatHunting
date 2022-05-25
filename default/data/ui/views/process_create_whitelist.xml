@@ -40,11 +40,11 @@
       <label>hash_sha256</label>
       <default></default>
     </input>
-    <input type="text" token="input_reason">
+    <input type="text" token="reason">
       <label>Reason</label>
       <default>CHANGEME</default>
     </input>
-        <input type="radio" token="input_mode">
+    <input type="radio" token="input_mode">
       <label>Mode</label>
       <choice value="add">Add</choice>
       <choice value="delete">Remove</choice>
@@ -64,6 +64,7 @@
 | eval input_process_path = COALESCE(if(trim("$process_path$")="", "*", trim("$process_path$")), "*") 
 | eval input_process_parent_path = COALESCE(if(trim("$process_parent_path$")="", "*", trim("$process_parent_path$")), "*") 
 | eval input_hash_sha256 = COALESCE(if(trim("$hash_sha256$")="", "*", trim("$hash_sha256$")), "*") 
+| eval input_reason = COALESCE(if(trim("$reason$")="", "CHANGEME", trim("$reason$")), "CHANGEME") 
 
 | eval host_fqdn = input_host_fqdn 
 | eval user_name = input_user_name 
@@ -72,7 +73,7 @@
 | eval process_path = input_process_path 
 | eval process_parent_path = input_process_parent_path 
 | eval hash_sha256 = input_hash_sha256 
-| eval reason = trim("$input_reason$")
+| eval reason = input_reason
 | eval added_date = strftime(now(), "%Y-%m-%d") 
 | eval contact = ("$env:user$") 
 | table * 
@@ -94,7 +95,6 @@
         </search>
         <option name="wrap">true</option>
         <option name="rowNumbers">false</option>
-        <option name="drilldown">cell</option>
         <option name="dataOverlayMode">none</option>
         <option name="count">5</option>
       </table>
@@ -104,16 +104,22 @@
     <panel>
       <table>
         <title>Current Entries</title>
-        <search>
+          <search>
           <query>| inputlookup threathunting_process_create_whitelist.csv | sort -added_date | fields added_date contact mitre_technique_id reason host_fqdn user_name process_path process_parent_path process_command_line hash_sha256
 </query>
           <earliest>0</earliest>
-        </search>
-        <option name="wrap">true</option>
-        <option name="rowNumbers">false</option>
+       </search>
+
         <option name="drilldown">cell</option>
-        <option name="dataOverlayMode">none</option>
-        <option name="count">100</option>
+        <drilldown>
+            <condition field="added_date">
+              <link>
+               <![CDATA[/app/ThreatHunting/process_create_whitelist?form.mitre_technique_id=$row.mitre_technique_id$&form.host_fqdn=$row.host_fqdn$&form.user_name=$row.user_name$&form.process_path=$row.process_path$&form.process_parent_path=$row.process_parent_path$&form.process_command_line=$row.process_command_line$&form.process_parent_command_line=$row.process_parent_command_line$&form.hash_sha256=$row.hash_sha256$&form.reason=$row.reason$]]>
+            </link>
+          </condition>
+                   </drilldown>
+
+    
       </table>
     </panel>
   </row>
