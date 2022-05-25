@@ -106,20 +106,17 @@
         <title>Current Entries</title>
           <search>
           <query>| inputlookup threathunting_process_create_whitelist.csv | sort -added_date | fields added_date contact mitre_technique_id reason host_fqdn user_name process_path process_parent_path process_command_line hash_sha256
-</query>
+          </query>
           <earliest>0</earliest>
        </search>
-
-        <option name="drilldown">cell</option>
+      <option name="drilldown">cell</option>
         <drilldown>
             <condition field="added_date">
               <link>
                <![CDATA[/app/ThreatHunting/process_create_whitelist?form.mitre_technique_id=$row.mitre_technique_id$&form.host_fqdn=$row.host_fqdn$&form.user_name=$row.user_name$&form.process_path=$row.process_path$&form.process_parent_path=$row.process_parent_path$&form.process_command_line=$row.process_command_line$&form.process_parent_command_line=$row.process_parent_command_line$&form.hash_sha256=$row.hash_sha256$&form.reason=$row.reason$]]>
-            </link>
-          </condition>
-                   </drilldown>
-
-    
+              </link>
+            </condition>
+          </drilldown>
       </table>
     </panel>
   </row>
