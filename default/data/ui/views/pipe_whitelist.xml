@@ -4,13 +4,12 @@
     <input type="dropdown" token="mitre_technique_id" id="mitre_technique_id">
       <label>mitre_technique_id</label>
       <search>
-        <query>| rest /servicesNS/-/ThreatHunting/saved/searches
-| search title="[T*]*"
-| makemv delim="," action.summary_index.mitre_technique_id
-| mvexpand action.summary_index.mitre_technique_id
-| stats dc(action.summary_index.mitre_technique) AS Searches by action.summary_index.mitre_technique_id
-| sort action.summary_index.mitre_technique_id
-| rename action.summary_index.mitre_technique_id AS "id" | table id</query>
+        <query>| rest /servicesNS/-/ThreatHunting/saved/searches 
+| search title="[T*]*" 
+| rex field=search "mitre_technique_id=\"(?&lt;id&gt;[^\.]*)\"" 
+| stats dc(id) AS Searches by id 
+| sort id 
+| table id</query>
       </search>
       <fieldForLabel>id</fieldForLabel>
       <fieldForValue>id</fieldForValue>
@@ -87,15 +86,25 @@
       <table>
         <title>Current Entries</title>
         <search>
-          <query>| inputlookup threathunting_pipe_whitelist.csv | sort -added_datetime | fields added_date contact mitre_technique_id reason host_fqdn process_path pipe_name
-</query>
+          <query>| inputlookup threathunting_pipe_whitelist.csv | sort -added_datetime | fields added_date contact mitre_technique_id reason host_fqdn process_path pipe_name</query>
           <earliest>0</earliest>
+          <latest></latest>
+          <refresh>2s</refresh>
+          <refreshType>delay</refreshType>
         </search>
-        <option name="wrap">true</option>
-        <option name="rowNumbers">false</option>
-        <option name="drilldown">cell</option>
-        <option name="dataOverlayMode">none</option>
         <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">none</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <condition field="added_date">
+            <link>
+              <![CDATA[/app/ThreatHunting/pipe_whitelist?form.mitre_technique_id=$row.mitre_technique_id$&form.host_fqdn=$row.host_fqdn$&form.pipe_name=$row.pipe_name$&form.process_path=$row.process_path$&form.input_reason=$row.reason$]]>
+            </link>
+          </condition>
+        </drilldown>
       </table>
     </panel>
   </row>

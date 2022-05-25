@@ -88,6 +88,8 @@
 | fields added_date contact host_fqdn priority</query>
           <earliest>0</earliest>
           <latest></latest>
+          <refresh>2s</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="count">100</option>
         <option name="dataOverlayMode">none</option>
@@ -95,6 +97,13 @@
         <option name="refresh.display">progressbar</option>
         <option name="rowNumbers">false</option>
         <option name="wrap">true</option>
+        <drilldown>
+          <condition field="added_date">
+            <link>
+              <![CDATA[/app/ThreatHunting/asset_priority?form.input_priority=$row.priority$&form.input_host_fqdn=$row.host_fqdn$]]>
+            </link>
+          </condition>
+        </drilldown>
       </table>
     </panel>
   </row>
