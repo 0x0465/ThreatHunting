@@ -66,6 +66,7 @@
 | fields - _raw _time 
 | where reason!="CHANGEME" 
 
+
 | inputlookup append=t threathunting_process_access_whitelist.csv 
 | sort -added_date 
 | dedup mitre_technique_id host_fqdn process_path target_process_path process_granted_access 

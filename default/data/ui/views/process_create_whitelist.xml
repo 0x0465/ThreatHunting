@@ -64,7 +64,6 @@
 | eval input_process_path = COALESCE(if(trim("$process_path$")="", "*", trim("$process_path$")), "*") 
 | eval input_process_parent_path = COALESCE(if(trim("$process_parent_path$")="", "*", trim("$process_parent_path$")), "*") 
 | eval input_hash_sha256 = COALESCE(if(trim("$hash_sha256$")="", "*", trim("$hash_sha256$")), "*") 
-| eval input_reason = COALESCE(if(trim("$reason$")="", "CHANGEME", trim("$reason$")), "CHANGEME") 
 
 | eval host_fqdn = input_host_fqdn 
 | eval user_name = input_user_name 
@@ -73,7 +72,7 @@
 | eval process_path = input_process_path 
 | eval process_parent_path = input_process_parent_path 
 | eval hash_sha256 = input_hash_sha256 
-| eval reason = input_reason
+| eval reason = trim("$input_reason$") 
 | eval added_date = strftime(now(), "%Y-%m-%d") 
 | eval contact = ("$env:user$") 
 | table * 
