@@ -1,6 +1,6 @@
 <form>
-  <label>File Created whitelist editor</label>
-  <fieldset submitButton="true" autoRun="false">
+  <label>File Access whitelist editor</label>
+  <fieldset submitButton="true" autoRun="true">
     <input type="dropdown" token="mitre_technique_id" id="mitre_technique_id">
       <label>mitre_technique_id</label>
       <search>
@@ -19,16 +19,12 @@
       <label>host_fqdn</label>
       <default></default>
     </input>
-    <input type="text" token="file_name">
-      <label>file_name</label>
+    <input type="text" token="process_path">
+      <label>process_path</label>
       <default></default>
     </input>
     <input type="text" token="file_path">
       <label>file_path</label>
-      <default></default>
-    </input>
-    <input type="text" token="process_path">
-      <label>process_path</label>
       <default></default>
     </input>
     <input type="text" token="input_reason">
@@ -51,32 +47,30 @@
 | eval input_host_fqdn = COALESCE(if(trim("$host_fqdn$")="", "*", trim("$host_fqdn$")), "*") 
 | eval input_mitre_technique_id = COALESCE(if(trim("$mitre_technique_id$")="", "*", trim("$mitre_technique_id$")), "*") 
 | eval input_process_path = COALESCE(if(trim("$process_path$")="", "*", trim("$process_path$")), "*") 
-| eval input_file_name = COALESCE(if(trim("$file_name$")="", "*", trim("$file_name$")), "*") 
 | eval input_file_path = COALESCE(if(trim("$file_path$")="", "*", trim("$file_path$")), "*") 
 
 | eval host_fqdn = input_host_fqdn 
 | eval mitre_technique_id = input_mitre_technique_id 
 | eval process_path = input_process_path 
-| eval file_name = input_file_name
 | eval file_path = input_file_path 
 | eval reason = trim("$input_reason$") 
 | eval added_date = strftime(now(), "%Y-%m-%d") 
-| eval contact = ("$env:user$")
+| eval contact = ("$env:user$") 
 | table * 
 | fields - _raw _time 
 | where reason!="CHANGEME" 
 
-| inputlookup append=t threathunting_file_create_whitelist.csv 
+| inputlookup append=t threathunting_file_access_whitelist.csv 
 | sort -added_date 
-| dedup mitre_technique_id host_fqdn process_path file_path file_name 
+| dedup mitre_technique_id host_fqdn process_path file_path 
 
 | eval mode = "$input_mode$" 
-| eval delete=if(mode="delete" and mitre_technique_id=input_mitre_technique_id and host_fqdn=input_host_fqdn and process_path=input_process_path and file_name=input_file_name and file_path=input_file_path, "yes", "no") 
+| eval delete=if(mode="delete" and mitre_technique_id=input_mitre_technique_id and host_fqdn=input_host_fqdn and process_path=input_process_path and file_path=input_file_path, "yes", "no") 
 | where delete="no" 
-| fields - delete mode 
-| fields - input_mitre_technique_id input_process_path input_file_name input_file_path
-| outputlookup threathunting_file_create_whitelist.csv 
-| fields added_date contact mitre_technique_id reason host_fqdn process_path file_path file_name</query>
+| fields - delete mode
+| fields - input_host_fqdn input_mitre_technique_id input_process_path input_file_path
+| outputlookup threathunting_file_access_whitelist.csv 
+| fields added_date contact mitre_technique_id reason host_fqdn process_path file_path</query>
           <earliest>0</earliest>
         </search>
         <option name="wrap">true</option>
@@ -92,7 +86,7 @@
       <table>
         <title>Current Entries</title>
         <search>
-          <query>| inputlookup threathunting_file_create_whitelist.csv | sort -added_datetime | fields added_date contact mitre_technique_id reason host_fqdn process_path file_path file_name</query>
+          <query>| inputlookup threathunting_file_access_whitelist.csv | sort -added_datetime | fields added_date contact mitre_technique_id reason host_fqdn process_path file_path</query>
           <earliest>0</earliest>
           <latest></latest>
           <refresh>2s</refresh>
@@ -107,10 +101,10 @@
         <drilldown>
           <condition field="added_date">
             <link>
-              <![CDATA[/app/ThreatHunting/file_create_whitelist?form.mitre_technique_id=$row.mitre_technique_id$&form.host_fqdn=$row.host_fqdn$&form.process_path=$row.process_path$&form.file_path=$row.file_path$&form.file_name=$row.file_name$&form.input_reason=$row.reason$]]>
+              <![CDATA[/app/ThreatHunting/file_access_whitelist?form.mitre_technique_id=$row.mitre_technique_id$&form.host_fqdn=$row.host_fqdn$&form.process_path=$row.process_path$&form.file_path=$row.file_path$&form.input_reason=$row.reason$]]>
             </link>
           </condition>
-        </drilldown>        
+        </drilldown>
       </table>
     </panel>
   </row>
