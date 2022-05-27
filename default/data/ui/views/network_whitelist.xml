@@ -104,15 +104,25 @@
       <table>
         <title>Current Entries</title>
         <search>
-          <query>| inputlookup threathunting_network_whitelist.csv | sort -added_date | fields added_date contact mitre_technique_id reason host_fqdn user_name process_path src_ip dst_ip dst_port 
-</query>
+          <query>| inputlookup threathunting_network_whitelist.csv | sort -added_date | fields added_date contact mitre_technique_id reason host_fqdn user_name process_path src_ip dst_ip dst_port</query>
           <earliest>0</earliest>
+          <latest></latest>
+          <refresh>2s</refresh>
+          <refreshType>delay</refreshType>
         </search>
-        <option name="wrap">true</option>
-        <option name="rowNumbers">false</option>
-        <option name="drilldown">cell</option>
-        <option name="dataOverlayMode">none</option>
         <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <condition field="added_date">
+            <link>
+              <![CDATA[/app/ThreatHunting/network_whitelist?form.mitre_technique_id=$row.mitre_technique_id$&form.host_fqdn=$row.host_fqdn$&form.user_name=$row.user_name$&form.process_path=$row.process_path$&form.src_ip=$row.src_ip$&form.dst_ip=$row.dst_ip$&form.dst_port=$row.dst_port$&form.input_reason=$row.reason$]]>
+            </link>
+          </condition>
+        </drilldown>
       </table>
     </panel>
   </row>
